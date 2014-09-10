@@ -5,7 +5,7 @@ define(["jquery","lib/crossDomainAjax"],function($){
 	me.getServerData =  function(options,callback){
 		self = this;
 		$.ajax({
-			url:'http://localhost/webapp/web/models/data.php',
+			url:'http://localhost/testing/webapp/web/models/data.php',
 			async: false,
 			type: 'post',
 			dataType: 'json'
