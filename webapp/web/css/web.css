@@ -1,0 +1,26 @@
+@media (max-width: 767px) {
+  div {
+    background-color: blue; } }
+@media (min-width: 768px) and (max-width: 991px) {
+  div {
+    background-color: blue; } }
+@media (min-width: 992px) and (max-width: 1199px) {
+  div {
+    background-color: blue; } }
+@media (min-width: 1200px) {
+  div {
+    background-color: blue; } }
+/* IE10 */
+@-ms-viewport {
+  width: device-width; }
+/* used for windows phone 8 older than update 3 */
+@-webkit-viewport {
+  width: device-width; }
+@-moz-viewport {
+  width: device-width; }
+@-ms-viewport {
+  width: device-width; }
+@-o-viewport {
+  width: device-width; }
+@viewport {
+  width: device-width; }

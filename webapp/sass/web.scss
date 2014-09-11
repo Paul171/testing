@@ -10,13 +10,19 @@ $screen-md-max: 1199px;
 	}
 }
 @media (min-width: $screen-sm-min) and (max-width: $screen-sm-max) {
-
+	div{
+		background-color: blue;
+	}
 }
 @media (min-width: $screen-md-min) and (max-width: $screen-md-max) {
-
+	div{
+		background-color: blue;
+	}
 }
 @media (min-width: $screen-lg-min) {
-
+	div{
+		background-color: blue;
+	}
  }
 /* IE10 */
 @-ms-viewport       { width: device-width; }

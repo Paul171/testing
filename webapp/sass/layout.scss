@@ -59,7 +59,7 @@ $value: 1.5;
 	//@extend .subjectText;
 	@include caption-text;
 }
-@debug @include caption-text;
+@debug 12px+12px;
 .paddingSubject{
 	padding: 50px 50%;
 	position: absolute;
@@ -77,13 +77,15 @@ $value: 1.5;
 	background: #ccc;
 	overflow: hidden;
 }
-$translateNmae: transform;
+$translateNmae: 'transform';
 @mixin multipleFields($translate,$select,$adjust){
-	-webkit-#($translateNmae): $translate;
-	-moz-#($translateNmae): $translate;
-	-ms-#($translateNmae): $translate;
-	-o-#($translateNmae): $translate;
-	#($translateNmae): $translate;
+	@warn "#($translateNmae)";
+	@error "wsdfs";
+	-webkit-#{$translateNmae}: $translate;
+	-moz-#{$translateNmae}: $translate;
+	-ms-#{$translateNmae}: $translate;
+	-o-#{$translateNmae}: $translate;
+	#{$translateNmae}: $translate;
 	-webkit-user-select: $select;
 	-moz-user-select: $select;
 	-ms-user-select: $select;
@@ -95,13 +97,22 @@ $translateNmae: transform;
 	text-size-adjust: $adjust;
 	@content;
 }
-@warn device-width;
-@function setWidth($n){
-	@if $n != null{
-		@error "#{$n} is exists";
+@for $i from 1 to 3{
+	.item-#{$i}{
+		width: 2em;
 	}
-	@else{
-		@error "$n is not exist";
+}
+$menuList: (header: ( info, contact, experience), content: ( info, contact, experience), footer: ( info, contact, experience));
+@debug $menuList;
+@each $var in info, contact, experience{
+	.#{$var}-header{
+		@extend #header;
+	}
+}
+@warn device-width;
+@function setWidth($n) {
+	@if( $n == 0 ){
+		$n: $n+1;
 	}
 	@return $n+10;
 }
@@ -109,8 +120,8 @@ $translateNmae: transform;
 
 	-webkit-tap-highlight-color: rgba(0,0,0,0) + rgba(0,0,0,0);
 	width: 100%;
-	$values: translateZ(0), none, none;
-	@include multipleFields($values){
+	$values: (translateZ(0), none, none);
+	@include multipleFields($values...){
 	-webkit-touch-callout: none;
 		ul {
 			list-style: none;
