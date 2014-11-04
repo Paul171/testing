@@ -16,9 +16,9 @@
 <div class="content">
     <div class="collapse navbar-collapse" id="menu">
       <ul class="nav navbar-nav">
-       {{# nls.menu}}
-        <li><a href="#">{{item}}</a></li>
-       {{/ nls.menu}}
+       {{# nls.menuId}}
+        <li><a href="#{{item}}">{{#f}}{{item}}{{/f}}</a></li>
+       {{/ nls.menuId}}
       </ul>
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->
@@ -27,23 +27,15 @@
 </div>
 
 <div class="content">
-
-<ul class="nav nav-tabs" role="tablist" aria-labelledby="dLabel">
- {{# nls.menu}}
- <li role="tab"><a href="#">{{item}}</a></li>
- {{/ nls.menu}}
-</ul>
-<div id="header">
-<div id="scrollable">
-  <div id="scroller">
-    <ul>
-      <li>{{one}}</li>
-      <li>{{two}}</li>
-      <li>{{three}}</li>
-    </ul>
-</div>
-</div>
-</div>
+  <div id="scrollable">
+    <div id="scroller">
+      <ul>
+        {{#nls.menuId}}
+          <li><div id="{{item}}"></div></li>
+        {{/nls.menuId}}
+      </ul>
+    </div>
+  </div> 
 </div>
 <div class="footer">
   <div class="text">{{nls.footer}}</div>
