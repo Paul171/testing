@@ -15,7 +15,8 @@ require.config({
 	 "serverCall": "web/controller/serverCall",
 	 "loading": "lib/loading",
 	 "crossDomainAjax": "lib/crossDomainAjax",
-	 "iscroll": "lib/iscroll"
+	 "iscroll": "lib/iscroll",
+	 "plugin": "web/controller/plugin"
 	},
 	'shim':{
 		'bootstrap': ['jquery']
