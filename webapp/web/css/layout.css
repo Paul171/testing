@@ -58,6 +58,7 @@ body {
     family: fantasy; }
 
 #intro, #proj, #exp {
+  width: 100%;
   position: relative; }
   #intro div.panel-primary, #proj div.panel-primary, #exp div.panel-primary {
     display: inline-block;
@@ -76,7 +77,7 @@ body {
     opacity: 0.8;
     z-index: 6; }
 
-#intro {
+.horizontalShow {
   width: 1000px; }
 
 div.arrow {

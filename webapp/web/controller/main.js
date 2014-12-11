@@ -16,7 +16,9 @@ require.config({
 	 "loading": "lib/loading",
 	 "crossDomainAjax": "lib/crossDomainAjax",
 	 "iscroll": "lib/iscroll",
-	 "plugin": "web/controller/plugin"
+	 "plugin": "web/controller/plugin",
+	 "matrixCal": "web/controller/matrixCalculation",
+	 "strokeStyle": "web/controller/strokeController"
 	},
 	'shim':{
 		'bootstrap': ['jquery']
