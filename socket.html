@@ -1,0 +1,26 @@
+<html>
+  <head>
+   <script src="/socket.io/socket.io.js"></script>
+   <script>
+   var socket = null;
+   window.onload = function(){
+    socket = io.connect();
+   var date= document.querySelector('#date');
+   socket.on('message',function(msg){ document.querySelector('#date').innerHTML=msg.message;});
+ }
+  function sendMessage(){
+    var inputText = document.querySelector('#inputText');
+    console.log("meesage", inputText);
+    socket.emit('message',{'message': inputText.value});
+  }
+</script>
+  </head>
+  <body>
+   
+This is our socket.html file
+  <div id="date"></div><br/>
+  <label for="inputText">Input</label>
+  <input type="text" id="inputText" name="inputText"/>  
+  <button onclick="sendMessage()">Send</button>
+  </body>
+</html>
