@@ -21,7 +21,10 @@ define(["jquery",
 		data.setData(server.getiPhoneData());
 		this.paint = false;
 		this.contentRoot = $('body');	
+		this.canvas = null;
 		this.stroke = new stroke();
+		this.character = [];
+		this.ratio = 1;
 		// this.matrixCalculation = {
 		// 	strokePre: null,
 		// 	strokeNow: null,
@@ -91,40 +94,51 @@ define(["jquery",
 		document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
 		var self =this;
 		var canvasDiv = document.getElementById('canvasDiv');
-		var canvasWidth = self.contentRoot.width()+'px',
-			canvasHeight= '200px';
-		this.canvas = document.createElement('canvas');
-		this.canvas.setAttribute('width', canvasWidth);
-		this.canvas.setAttribute('height', canvasHeight);
-		this.canvas.setAttribute('id', 'canvasDraw');
-		canvasDiv.appendChild(this.canvas);
+		// var canvasWidth = self.contentRoot.width()+'px',
+		// 	canvasHeight= '200px';
+		// this.canvas = document.createElement('canvas');
+		// this.canvas.setAttribute('width', canvasWidth);
+		// this.canvas.setAttribute('height', canvasHeight);
+		// this.canvas.setAttribute('id', 'canvasDraw');
+		this.canvas = document.querySelector('#canvasDraw');
+		$(this.canvas).attr('width',(innerWidth<768?this.contentRoot.width()-10:this.contentRoot.width()*0.4));
+		this.canvasWidth_org = $(this.canvas).attr('width');
+		// canvasDiv.appendChild(this.canvas);
 		if(typeof G_vmlCanvasManager != 'undefined') {
 			this.canvas = G_vmlCanvasManager.initElement(canvas);
 		}
 		this.context = this.canvas.getContext("2d");
 		$('#canvasDraw').mousedown(function(e){
 			// debugger
-			// debugger
-			var top = e.target.offsetParent.offsetTop + e.target.offsetTop + self.contentRoot.find('.header').height();
+			
+			self.stroke= new stroke();
+			var top = e.target.offsetParent.offsetTop + e.target.offsetParent.offsetParent.offsetTop + e.target.offsetTop + self.iscroll.y;
 			var left= e.target.offsetParent.offsetLeft + e.target.offsetLeft;
-		  var mouseX = e.pageX - left;
+		  var mouseX = e.offsetX - left ;
 		  var mouseY = e.pageY - top;
-				
+		  // console.log("this.iscroll",self.iscroll);
 		  self.paint = true;
 		  self.addClick(mouseX, mouseY,self.paint);
+		  self.context.beginPath();
 		  self.redraw();
 		});
 		$('#canvasDraw').mousemove(function(e){
+			console.log("self.paint",self.paint);
 		  if(self.paint){
 		  	// debugger
-		  	var top = e.target.offsetParent.offsetTop + e.target.offsetTop + self.contentRoot.find('.header').height();
+
+		  	var top = e.target.offsetParent.offsetTop + e.target.offsetParent.offsetParent.offsetTop + e.target.offsetTop + self.iscroll.y;
 		  	var left= e.target.offsetParent.offsetLeft + e.target.offsetLeft;
-		    self.addClick(e.pageX - left, e.pageY - top, true);
+		  	console.log(e);
+		    self.addClick(e.offsetX - left,e.pageY- top, true);
+		    console.log("top",top,"left",left,"e.pageX",e.pageX,"e.pageY",e.pageY);
 		    self.redraw();
 		  }
 		});
 		$('#canvasDraw').mouseup(function(e){
 		  self.paint = false;
+		  self.context.closePath();
+		  self.character.push(self.stroke);
 		});
 		//If the marker goes off the paper, then forget you
 		$('#canvasDraw').mouseleave(function(e){
@@ -133,6 +147,22 @@ define(["jquery",
 		window.addEventListener('resize',function(){
 			console.log("innerWidth",innerWidth,outerWidth,self.intro.width(),self.contentRoot.width());
 			$('.next').css('right',self.intro.width() - self.contentRoot.width()+'px');
+			var resizeDate = new Date();
+			if(innerWidth <= 767){
+				$(self.canvas).attr('width',self.contentRoot.width()-10);	
+			}
+			else{
+				$(self.canvas).attr('width',self.contentRoot.width()*0.4-10);
+			}
+			setTimeout(function(){
+				var date = new Date();
+				if(date>resizeDate){	
+					
+					self.ratio = $(self.canvas).attr('width')/self.canvasWidth_org;
+					self.canvasWidth_org = $(self.canvas).attr('width');
+					self.redraw();
+				}
+			},6000);
 		});
 		//this.contentRoot.append(mustache.render(view,this.model));
 	}
@@ -143,24 +173,63 @@ define(["jquery",
 	  // clickDrag.push(dragging);
 	}
 	me.prototype.redraw = function(){
+		// debugger
 	  this.context.clearRect(0, 0, this.context.canvas.width, this.context.canvas.height); // Clears the canvas
-	  
+	  // var ratio = $(this.canvas).attr('width')/(this.contentRoot.width() -10) ==1?1:0.4;
+	  var ratio =(this.ratio?this.ratio:1);
+	  // var ratio = 1;
+	  this.ratio = ratio;
+	  console.log("th.ratio",this.ratio);
+	  console.log("ratio",ratio);
 	  this.context.strokeStyle = "#df4b26";
+	  this.context.lineCap = "round";
 	  this.context.lineJoin = "round";
 	  this.context.lineWidth = 5;
-	  var clickX=this.stroke.getXCoordinate();
-	  var clickY=this.stroke.getYCoordinate();		
-	  for(var i=0; i < clickX.length; i++) {		
-	    this.context.beginPath();
-	    if(i){
-	      this.context.moveTo(clickX[i-1], clickY[i-1]);
-	     }else{
-	       this.context.moveTo(clickX[i]-1, clickY[i]);
-	     }
-	     this.context.lineTo(clickX[i], clickY[i]);
-	     this.context.closePath();
-	     this.context.stroke();
+	  if(this.character){
+	  	for(var i=0; i< this.character.length; i++){
+		  	  var currentStroke = this.character[i];
+			  var clickX=currentStroke.getXCoordinate();
+			  var clickY=currentStroke.getYCoordinate();		
+			  // console.log("currentStroke",currentStroke);
+			  for(var n=0; n < clickX.length; n++) {		
+			    if(ratio != 1){
+					currentStroke.setXCoordinate(clickX[n]*ratio);
+					currentStroke.setYCoordinate(clickY[n]*ratio);
+				}
+			    if(n){
+
+			      this.context.moveTo(clickX[n-1]*ratio, clickY[n-1]);
+			     }else{
+			       this.context.moveTo((clickX[n]-1)*ratio, clickY[n]);
+			     }
+			     this.context.lineTo(clickX[n]*ratio, clickY[n]);
+			     
+			     this.context.stroke();
+			  }	
+		  }
 	  }
+	  
+	  var currentStroke = this.stroke;
+	  var clickX=currentStroke.getXCoordinate();
+	  var clickY=currentStroke.getYCoordinate();
+	  console.log("currentStroke",currentStroke);
+	  for(var n=0; n < clickX.length; n++) {
+		if(ratio != 1){
+			currentStroke.setXCoordinate(clickX[n]*ratio);
+			currentStroke.setYCoordinate(clickY[n]*ratio);
+		}		
+	    this.context.moveTo(clickX[n]*ratio, clickY[n]);
+	    if(n){
+	      this.context.lineTo(clickX[n-1]*ratio, clickY[n-1]);
+	     }else{
+	       this.context.lineTo((clickX[n]-1)*ratio, clickY[n]);
+	     }
+	     
+	     
+	     this.context.stroke();
+	  }	
+	  
+	  
 	}
 	me.prototype.loadingMask = function(){
 		console.log(this.contentRoot);
