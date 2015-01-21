@@ -139,6 +139,7 @@ define(["jquery",
 		  self.paint = false;
 		  self.context.closePath();
 		  self.character.push(self.stroke);
+		  self.stroke = new stroke();
 		});
 		//If the marker goes off the paper, then forget you
 		$('#canvasDraw').mouseleave(function(e){
@@ -148,6 +149,7 @@ define(["jquery",
 			console.log("innerWidth",innerWidth,outerWidth,self.intro.width(),self.contentRoot.width());
 			$('.next').css('right',self.intro.width() - self.contentRoot.width()+'px');
 			var resizeDate = new Date();
+			// debugger
 			if(innerWidth <= 767){
 				$(self.canvas).attr('width',self.contentRoot.width()-10);	
 			}
@@ -193,8 +195,8 @@ define(["jquery",
 			  // console.log("currentStroke",currentStroke);
 			  for(var n=0; n < clickX.length; n++) {		
 			    if(ratio != 1){
-					currentStroke.setXCoordinate(clickX[n]*ratio);
-					currentStroke.setYCoordinate(clickY[n]*ratio);
+					currentStroke.setCoordinateByIndex(n, clickX[n]*ratio, clickY[n]);
+					// currentStroke.setYCoordinate(clickY[n]*ratio);
 				}
 			    if(n){
 
@@ -205,7 +207,9 @@ define(["jquery",
 			     this.context.lineTo(clickX[n]*ratio, clickY[n]);
 			     
 			     this.context.stroke();
-			  }	
+			  }
+			  console.log("character currentStroke",currentStroke);
+			  console.log("this.character[i]",this.character[i]);	
 		  }
 	  }
 	  
@@ -215,8 +219,10 @@ define(["jquery",
 	  console.log("currentStroke",currentStroke);
 	  for(var n=0; n < clickX.length; n++) {
 		if(ratio != 1){
-			currentStroke.setXCoordinate(clickX[n]*ratio);
-			currentStroke.setYCoordinate(clickY[n]*ratio);
+			// debugger
+			currentStroke.setCoordinateByIndex(n, clickX[n]*ratio, clickY[n]);
+			// currentStroke.setXCoordinate(clickX[n]*ratio);
+			// currentStroke.setYCoordinate(clickY[n]*ratio);
 		}		
 	    this.context.moveTo(clickX[n]*ratio, clickY[n]);
 	    if(n){
@@ -227,7 +233,9 @@ define(["jquery",
 	     
 	     
 	     this.context.stroke();
-	  }	
+	  }
+	  console.log("stroke currentStroke",currentStroke);
+	  console.log("this.stroke",this.stroke);	
 	  
 	  
 	}
