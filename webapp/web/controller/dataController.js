@@ -25,6 +25,7 @@ define(["jquery",
 		this.stroke = new stroke();
 		this.character = [];
 		this.ratio = 1;
+		this.chkRedraw = false;
 		// this.matrixCalculation = {
 		// 	strokePre: null,
 		// 	strokeNow: null,
@@ -156,15 +157,19 @@ define(["jquery",
 			else{
 				$(self.canvas).attr('width',self.contentRoot.width()*0.4-10);
 			}
+			self.chkRedraw = false;
 			setTimeout(function(){
 				var date = new Date();
-				if(date>resizeDate){	
-					
-					self.ratio = $(self.canvas).attr('width')/self.canvasWidth_org;
+				if(date>resizeDate &&!self.chkRedraw){	
+					// debugger
+					var ratio = $(self.canvas).attr('width')/self.canvasWidth_org;
 					self.canvasWidth_org = $(self.canvas).attr('width');
-					self.redraw();
+					self.redraw(ratio);
+					// debugger
+					self.chkRedraw = true;
+					// self.ratio = 1;
 				}
-			},6000);
+			},2000);
 		});
 		//this.contentRoot.append(mustache.render(view,this.model));
 	}
@@ -174,19 +179,20 @@ define(["jquery",
 	  this.stroke.setYCoordinate(y);
 	  // clickDrag.push(dragging);
 	}
-	me.prototype.redraw = function(){
+	me.prototype.redraw = function(ratio){
 		// debugger
 	  this.context.clearRect(0, 0, this.context.canvas.width, this.context.canvas.height); // Clears the canvas
 	  // var ratio = $(this.canvas).attr('width')/(this.contentRoot.width() -10) ==1?1:0.4;
-	  var ratio =(this.ratio?this.ratio:1);
+	  this.ratio = (ratio?ratio:1);
 	  // var ratio = 1;
-	  this.ratio = ratio;
+	  // this.ratio = ratio;
 	  console.log("th.ratio",this.ratio);
 	  console.log("ratio",ratio);
 	  this.context.strokeStyle = "#df4b26";
 	  this.context.lineCap = "round";
 	  this.context.lineJoin = "round";
 	  this.context.lineWidth = 5;
+	  // debugger
 	  if(this.character){
 	  	for(var i=0; i< this.character.length; i++){
 		  	  var currentStroke = this.character[i];
@@ -195,16 +201,16 @@ define(["jquery",
 			  // console.log("currentStroke",currentStroke);
 			  for(var n=0; n < clickX.length; n++) {		
 			    if(ratio != 1){
-					currentStroke.setCoordinateByIndex(n, clickX[n]*ratio, clickY[n]);
+					currentStroke.setCoordinateByIndex(n, clickX[n]*this.ratio, clickY[n]);
 					// currentStroke.setYCoordinate(clickY[n]*ratio);
 				}
 			    if(n){
 
-			      this.context.moveTo(clickX[n-1]*ratio, clickY[n-1]);
+			      this.context.moveTo(clickX[n-1], clickY[n-1]);
 			     }else{
-			       this.context.moveTo((clickX[n]-1)*ratio, clickY[n]);
+			       this.context.moveTo((clickX[n]-1), clickY[n]);
 			     }
-			     this.context.lineTo(clickX[n]*ratio, clickY[n]);
+			     this.context.lineTo(clickX[n], clickY[n]);
 			     
 			     this.context.stroke();
 			  }
@@ -218,17 +224,17 @@ define(["jquery",
 	  var clickY=currentStroke.getYCoordinate();
 	  console.log("currentStroke",currentStroke);
 	  for(var n=0; n < clickX.length; n++) {
-		if(ratio != 1){
-			// debugger
-			currentStroke.setCoordinateByIndex(n, clickX[n]*ratio, clickY[n]);
-			// currentStroke.setXCoordinate(clickX[n]*ratio);
-			// currentStroke.setYCoordinate(clickY[n]*ratio);
-		}		
-	    this.context.moveTo(clickX[n]*ratio, clickY[n]);
+		// if(ratio != 1){
+		// 	// debugger
+		// 	currentStroke.setCoordinateByIndex(n, clickX[n], clickY[n]);
+		// 	// currentStroke.setXCoordinate(clickX[n]*ratio);
+		// 	// currentStroke.setYCoordinate(clickY[n]*ratio);
+		// }		
+	    this.context.moveTo(clickX[n], clickY[n]);
 	    if(n){
-	      this.context.lineTo(clickX[n-1]*ratio, clickY[n-1]);
+	      this.context.lineTo(clickX[n-1], clickY[n-1]);
 	     }else{
-	       this.context.lineTo((clickX[n]-1)*ratio, clickY[n]);
+	       this.context.lineTo((clickX[n]-1), clickY[n]);
 	     }
 	     
 	     
