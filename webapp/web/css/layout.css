@@ -1,3 +1,12 @@
+#canvasDiv .header {
+  display: inline-block;
+  position: relative;
+  width: 50%; }
+
+@media (max-width: 767px) {
+  #canvasDiv .header {
+    width: 100%;
+    display: block; } }
 /* IE10 */
 @-ms-viewport {
   width: device-width; }
@@ -44,6 +53,9 @@ body {
   position: relative;
   top: 0px; }
 
+canvas {
+  border: 1px solid black; }
+
 .header {
   position: absolute;
   top: 0px;
@@ -58,13 +70,11 @@ body {
     family: fantasy; }
 
 #intro, #proj, #exp {
-  width: 100%;
+  width: 100;
   position: relative; }
   #intro div.panel-primary, #proj div.panel-primary, #exp div.panel-primary {
     display: inline-block;
     margin: 30px; }
-  #intro div.prev:hover, #intro div.next:hover, #proj div.prev:hover, #proj div.next:hover, #exp div.prev:hover, #exp div.next:hover {
-    opacity: 1; }
   #intro div.prev, #intro div.next, #proj div.prev, #proj div.next, #exp div.prev, #exp div.next {
     box-shadow: 0px 10px 5px #888888;
     top: 40px;
@@ -76,6 +86,8 @@ body {
     background-color: white;
     opacity: 0.8;
     z-index: 6; }
+    #intro div.prev:hover, #intro div.next:hover, #proj div.prev:hover, #proj div.next:hover, #exp div.prev:hover, #exp div.next:hover {
+      opacity: 1; }
 
 .horizontalShow {
   width: 1000px; }
@@ -94,12 +106,10 @@ div.arrow {
 .next {
   right: 0px;
   background-color: white; }
-
-.next .arrow {
-  right: 0px;
-  border-top: 30px solid transparent;
-  border-left: 30px solid yellow;
-  border-bottom: 30px solid transparent; }
+  .next .arrow {
+    border-top: 30px solid transparent;
+    border-left: 30px solid yellow;
+    border-bottom: 30px solid transparent; }
 
 .paddingSubject {
   padding: 50px 50%;

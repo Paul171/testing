@@ -22,10 +22,12 @@ define(["jquery",
 		this.paint = false;
 		this.contentRoot = $('body');	
 		this.canvas = null;
+		this.canvasTemplate = null;
 		this.stroke = new stroke();
 		this.character = [];
 		this.ratio = 1;
 		this.chkRedraw = false;
+		this.templateCharacter = [];
 		// this.matrixCalculation = {
 		// 	strokePre: null,
 		// 	strokeNow: null,
@@ -89,29 +91,21 @@ define(["jquery",
 		$('.dropdown-toggle').dropdown();
 		console.log("scrollable",$("#scrollable"));
 		this.iscroll = new IScroll('#scrollable',{mouseWheel: true,scrollbars: true, shrinkScrollbars:'scale'});
-		this.iscroll.on('scrollStart',function(e){
-			console.log("e",e);
-		});
+		console.log("this.iscroll",this.iscroll);
 		document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
 		var self =this;
-		var canvasDiv = document.getElementById('canvasDiv');
-		// var canvasWidth = self.contentRoot.width()+'px',
-		// 	canvasHeight= '200px';
-		// this.canvas = document.createElement('canvas');
-		// this.canvas.setAttribute('width', canvasWidth);
-		// this.canvas.setAttribute('height', canvasHeight);
-		// this.canvas.setAttribute('id', 'canvasDraw');
+		this.canvasTemplate = document.querySelector('#canvasTemplate');
 		this.canvas = document.querySelector('#canvasDraw');
 		$(this.canvas).attr('width',(innerWidth<768?this.contentRoot.width()-10:this.contentRoot.width()*0.4));
+		$(this.canvasTemplate).attr('width',(innerWidth<768?this.contentRoot.width()-10:this.contentRoot.width()*0.4));
 		this.canvasWidth_org = $(this.canvas).attr('width');
-		// canvasDiv.appendChild(this.canvas);
 		if(typeof G_vmlCanvasManager != 'undefined') {
 			this.canvas = G_vmlCanvasManager.initElement(canvas);
 		}
 		this.context = this.canvas.getContext("2d");
-		$('#canvasDraw').mousedown(function(e){
+		this.contextTemplate = this.canvasTemplate.getContext("2d");
+		$('#canvasDraw,#canvasTemplate').mousedown(function(e){
 			// debugger
-			
 			self.stroke= new stroke();
 			var top = e.target.offsetParent.offsetTop + e.target.offsetParent.offsetParent.offsetTop + e.target.offsetTop + self.iscroll.y;
 			var left= e.target.offsetParent.offsetLeft + e.target.offsetLeft;
@@ -120,10 +114,18 @@ define(["jquery",
 		  // console.log("this.iscroll",self.iscroll);
 		  self.paint = true;
 		  self.addClick(mouseX, mouseY,self.paint);
-		  self.context.beginPath();
-		  self.redraw();
+		  var context = (e.target.id == 'canvasDraw')?self.context:self.contextTemplate;
+		  // if(e.target.id == 'canvasDraw'){
+	  	  context.beginPath();
+	  	  self.redraw(context,e.target.id);
+		  // }
+		  // else{
+		  // 	self.contextTemplate.beginPath();
+		  // 	self.redraw(self.contextTemplate);
+		  // }
+		  
 		});
-		$('#canvasDraw').mousemove(function(e){
+		$('#canvasDraw,#canvasTemplate').mousemove(function(e){
 			console.log("self.paint",self.paint);
 		  if(self.paint){
 		  	// debugger
@@ -133,17 +135,31 @@ define(["jquery",
 		  	console.log(e);
 		    self.addClick(e.offsetX - left,e.pageY- top, true);
 		    console.log("top",top,"left",left,"e.pageX",e.pageX,"e.pageY",e.pageY);
-		    self.redraw();
+		    // self.redraw();
+		    // if(e.target == this.canvas){
+			  	self.redraw((e.target.id == 'canvasDraw')?self.context:self.contextTemplate,e.target.id);
+			// }
+			// else{
+			  	// self.redraw(self.contextTemplate);
+			// }
 		  }
 		});
-		$('#canvasDraw').mouseup(function(e){
+		$('#canvasDraw,#canvasTemplate').mouseup(function(e){
 		  self.paint = false;
-		  self.context.closePath();
-		  self.character.push(self.stroke);
+		  // self.context.closePath();
+		  if(e.target.id == 'canvasDraw'){
+			  	self.redraw(self.context,e.target.id);
+			  	self.character.push(self.stroke);
+		  }
+		  else{
+			  	self.redraw(self.contextTemplate,e.target.id);
+			  	self.templateCharacter.push(self.stroke);
+		  }
+		  // self.character.push(self.stroke);
 		  self.stroke = new stroke();
 		});
 		//If the marker goes off the paper, then forget you
-		$('#canvasDraw').mouseleave(function(e){
+		$('#canvasDraw,#canvasTemplate').mouseleave(function(e){
 		  self.paint = false;
 		});
 		window.addEventListener('resize',function(){
@@ -153,9 +169,11 @@ define(["jquery",
 			// debugger
 			if(innerWidth <= 767){
 				$(self.canvas).attr('width',self.contentRoot.width()-10);	
+				$(self.canvasTemplate).attr('width',self.contentRoot.width()-10);	
 			}
 			else{
 				$(self.canvas).attr('width',self.contentRoot.width()*0.4-10);
+				$(self.canvasTemplate).attr('width',self.contentRoot.width()-10);
 			}
 			self.chkRedraw = false;
 			setTimeout(function(){
@@ -164,7 +182,9 @@ define(["jquery",
 					// debugger
 					var ratio = $(self.canvas).attr('width')/self.canvasWidth_org;
 					self.canvasWidth_org = $(self.canvas).attr('width');
-					self.redraw(ratio);
+					// scale the template and drawing area
+					self.redraw(self.context, 'canvasDraw', ratio);
+					self.redraw(self.contextTemplate, 'canvasTemplate', ratio);
 					// debugger
 					self.chkRedraw = true;
 					// self.ratio = 1;
@@ -179,23 +199,11 @@ define(["jquery",
 	  this.stroke.setYCoordinate(y);
 	  // clickDrag.push(dragging);
 	}
-	me.prototype.redraw = function(ratio){
-		// debugger
-	  this.context.clearRect(0, 0, this.context.canvas.width, this.context.canvas.height); // Clears the canvas
-	  // var ratio = $(this.canvas).attr('width')/(this.contentRoot.width() -10) ==1?1:0.4;
-	  this.ratio = (ratio?ratio:1);
-	  // var ratio = 1;
-	  // this.ratio = ratio;
-	  console.log("th.ratio",this.ratio);
-	  console.log("ratio",ratio);
-	  this.context.strokeStyle = "#df4b26";
-	  this.context.lineCap = "round";
-	  this.context.lineJoin = "round";
-	  this.context.lineWidth = 5;
-	  // debugger
-	  if(this.character){
-	  	for(var i=0; i< this.character.length; i++){
-		  	  var currentStroke = this.character[i];
+	//redrawCharacter(): should accept two arguments, one is character, the other one is context
+	me.prototype.redrawCharacter = function(context, character,ratio){
+		if(character){
+		  	for(var i=0; i< character.length; i++){
+		  	  var currentStroke = character[i];
 			  var clickX=currentStroke.getXCoordinate();
 			  var clickY=currentStroke.getYCoordinate();		
 			  // console.log("currentStroke",currentStroke);
@@ -206,19 +214,71 @@ define(["jquery",
 				}
 			    if(n){
 
-			      this.context.moveTo(clickX[n-1], clickY[n-1]);
+			      context.moveTo(clickX[n-1], clickY[n-1]);
 			     }else{
-			       this.context.moveTo((clickX[n]-1), clickY[n]);
+			       context.moveTo((clickX[n]-1), clickY[n]);
 			     }
-			     this.context.lineTo(clickX[n], clickY[n]);
+			     context.lineTo(clickX[n], clickY[n]);
 			     
-			     this.context.stroke();
+			     context.stroke();
 			  }
 			  console.log("character currentStroke",currentStroke);
-			  console.log("this.character[i]",this.character[i]);	
-		  }
+			  console.log("this.character[i]",character[i]);	
+			}
+		}
+	}
+	// accept two arguments, one is ratio which can be optional, the other one is context for different canvas
+	me.prototype.redraw = function(context, id, ratio){
+		// debugger
+	  context.clearRect(0, 0, context.canvas.width, context.canvas.height); // Clears the canvas
+	  // var ratio = $(this.canvas).attr('width')/(this.contentRoot.width() -10) ==1?1:0.4;
+	  this.ratio = (ratio?ratio:1);
+	  // var ratio = 1;
+	  // this.ratio = ratio;
+	  console.log("th.ratio",this.ratio);
+	  console.log("ratio",ratio);
+	  context.strokeStyle = "#df4b26";
+	  context.lineCap = "round";
+	  context.lineJoin = "round";
+	  context.lineWidth = 5;
+	  // debugger
+	  // if(this.character){
+	  // 	for(var i=0; i< this.character.length; i++){
+		 //  	  var currentStroke = this.character[i];
+			//   var clickX=currentStroke.getXCoordinate();
+			//   var clickY=currentStroke.getYCoordinate();		
+			//   // console.log("currentStroke",currentStroke);
+			//   for(var n=0; n < clickX.length; n++) {		
+			//     if(ratio != 1){
+			// 		currentStroke.setCoordinateByIndex(n, clickX[n]*this.ratio, clickY[n]);
+			// 		// currentStroke.setYCoordinate(clickY[n]*ratio);
+			// 	}
+			//     if(n){
+
+			//       this.context.moveTo(clickX[n-1], clickY[n-1]);
+			//      }else{
+			//        this.context.moveTo((clickX[n]-1), clickY[n]);
+			//      }
+			//      this.context.lineTo(clickX[n], clickY[n]);
+			     
+			//      this.context.stroke();
+			//   }
+			//   console.log("character currentStroke",currentStroke);
+			//   console.log("this.character[i]",this.character[i]);	
+		 //  }
+	  // }
+	  if(ratio){
+	  	this.redrawCharacter(context,(id=='canvasDraw')? this.character:this.templateCharacter,this.ratio);
+	  	// this.redrawCharacter(context, this.templateCharacter,this.ratio);
 	  }
-	  
+	  else if(id){
+	  	if(id=='canvasDraw'){
+	  		this.redrawCharacter(context, this.character,this.ratio);
+	  	}
+	  	else{
+	  		this.redrawCharacter(context, this.templateCharacter,this.ratio);		
+	  	}
+	  }
 	  var currentStroke = this.stroke;
 	  var clickX=currentStroke.getXCoordinate();
 	  var clickY=currentStroke.getYCoordinate();
@@ -230,15 +290,15 @@ define(["jquery",
 		// 	// currentStroke.setXCoordinate(clickX[n]*ratio);
 		// 	// currentStroke.setYCoordinate(clickY[n]*ratio);
 		// }		
-	    this.context.moveTo(clickX[n], clickY[n]);
+	    context.moveTo(clickX[n], clickY[n]);
 	    if(n){
-	      this.context.lineTo(clickX[n-1], clickY[n-1]);
+	      context.lineTo(clickX[n-1], clickY[n-1]);
 	     }else{
-	       this.context.lineTo((clickX[n]-1), clickY[n]);
+	      context.lineTo((clickX[n]-1), clickY[n]);
 	     }
 	     
 	     
-	     this.context.stroke();
+	     context.stroke();
 	  }
 	  console.log("stroke currentStroke",currentStroke);
 	  console.log("this.stroke",this.stroke);	

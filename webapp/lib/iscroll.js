@@ -229,8 +229,8 @@ var utils = (function () {
 	me.click = function (e) {
 		var target = e.target,
 			ev;
-
-		if ( !(/(SELECT|INPUT|TEXTAREA)/i).test(target.tagName) ) {
+		// debugger
+		if ( !(/(SELECT|INPUT|TEXTAREA|CANVAS)/i).test(target.tagName) ) {
 			ev = document.createEvent('MouseEvents');
 			ev.initMouseEvent('click', true, true, e.view, 1,
 				target.screenX, target.screenY, target.clientX, target.clientY,
@@ -271,7 +271,7 @@ function IScroll (el, options) {
 		bounceEasing: '',
 
 		preventDefault: true,
-		preventDefaultException: { tagName: /^(INPUT|TEXTAREA|BUTTON|SELECT)$/ },
+		preventDefaultException: { tagName: /^(INPUT|TEXTAREA|BUTTON|SELECT|CANVAS)$/ },
 
 		HWCompositing: true,
 		useTransition: true,
@@ -376,6 +376,7 @@ IScroll.prototype = {
 	},
 
 	_start: function (e) {
+		// debugger
 		// React to left mouse button only
 		if ( utils.eventType[e.type] != 1 ) {
 			if ( e.button !== 0 ) {
@@ -386,7 +387,9 @@ IScroll.prototype = {
 		if ( !this.enabled || (this.initiated && utils.eventType[e.type] !== this.initiated) ) {
 			return;
 		}
-
+		if(utils.preventDefaultException(e.target, this.options.preventDefaultException)){
+			return;
+		}
 		if ( this.options.preventDefault && !utils.isBadAndroid && !utils.preventDefaultException(e.target, this.options.preventDefaultException) ) {
 			e.preventDefault();
 		}
@@ -997,6 +1000,7 @@ IScroll.prototype = {
 
 			this.on('beforeScrollStart', function () {
 				_indicatorsMap(function () {
+					console.log("scroll",this);
 					this.fade(1, true);
 				});
 			});
@@ -1710,7 +1714,7 @@ Indicator.prototype = {
 
 	_start: function (e) {
 		var point = e.touches ? e.touches[0] : e;
-
+		// debugger
 		e.preventDefault();
 		e.stopPropagation();
 
@@ -1722,6 +1726,7 @@ Indicator.prototype = {
 		this.lastPointY	= point.pageY;
 
 		this.startTime	= utils.getTime();
+
 
 		if ( !this.options.disableTouch ) {
 			utils.addEvent(window, 'touchmove', this);
