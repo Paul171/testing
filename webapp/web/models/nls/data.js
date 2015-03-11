@@ -21,6 +21,11 @@ define({
 			{"item": "web design"},
 			{"item": "Bootstrap"}]
 		},
+		"writeCharacterMsg": "Please write the character for analysis",
+		"missingStrokeMsg": "Stroke ~~1 is missing stroke",
+		"extraStrokeMsg": "Stroke ~~1 is extra stroke",
+		"strokeSequenceMsg": "Stroke ~~1 should be written as ~~2 strke",
+		"correctMsg": "Correct",
 		"footer": "Thanks for looking"
 	}
 });

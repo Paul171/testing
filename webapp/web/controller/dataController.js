@@ -11,14 +11,17 @@ define(["jquery",
 	"iscroll",
 	"plugin",
 	"matrixCal",
-	"strokeStyle"]
-	,function($,mustache,bootstrap,server,view,introView, projectView, experienceView, data,Loading, iscroll, plugin, matrixCal,stroke){
+	"strokeStyle",
+	"hungarian"]
+	,function($,mustache,bootstrap,server,view,introView, projectView, experienceView, data,Loading, iscroll, plugin, matrixCal,stroke,hungarian){
 	"use strict";
 	var me = function(){
-		this.model = new data();	
+		
+		// debugger	
 		//console.log(this.model);
 		data.setData(server.getServerData("ss","ss"));
 		data.setData(server.getiPhoneData());
+		this.model = data.getData();
 		this.paint = false;
 		this.contentRoot = $('body');	
 		this.canvas = null;
@@ -44,13 +47,15 @@ define(["jquery",
 		// this.matrixCalculation.calculate();
 		// // this.matrixCal = new matrixCal();
 		// console.log("c",matrixCal);	
-		matrixCal.calculate();
-		this.contentRoot.append( mustache.render(view,$.extend(data.getData(),{f:this.showContent})));
+		
+		this.contentRoot.append( mustache.render(view,$.extend(this.model,{f:this.showContent})));
 		this.intro = this.contentRoot.find('#intro'),
 		this.proj  = this.contentRoot.find('#proj'),
 		this.exp   = this.contentRoot.find('#exp');
 		this.scrollItem = $('#scrollable');
 		this.displayContent();	
+		// console.log(new hungarian().he);
+		this.hungarian = new hungarian();
 	}
 	me.prototype.showContent = function(){
 		
@@ -96,6 +101,8 @@ define(["jquery",
 		var self =this;
 		this.canvasTemplate = document.querySelector('#canvasTemplate');
 		this.canvas = document.querySelector('#canvasDraw');
+		this.btnCheckDraw = $("#btnCheckDraw");
+		this.btnCheckDraw.on('click',$.proxy(this.chkDraw, this));
 		$(this.canvas).attr('width',(innerWidth<768?this.contentRoot.width()-10:this.contentRoot.width()*0.4));
 		$(this.canvasTemplate).attr('width',(innerWidth<768?this.contentRoot.width()-10:this.contentRoot.width()*0.4));
 		this.canvasWidth_org = $(this.canvas).attr('width');
@@ -116,6 +123,7 @@ define(["jquery",
 		  self.addClick(mouseX, mouseY,self.paint);
 		  var context = (e.target.id == 'canvasDraw')?self.context:self.contextTemplate;
 		  // if(e.target.id == 'canvasDraw'){
+		  // debugger	
 	  	  context.beginPath();
 	  	  self.redraw(context,e.target.id);
 		  // }
@@ -199,6 +207,80 @@ define(["jquery",
 	  this.stroke.setYCoordinate(y);
 	  // clickDrag.push(dragging);
 	}
+	me.prototype.chkDraw = function(){
+		console.log(this.character,"  template:",this.templateCharacter);
+		var matrix = new matrixCal();
+		var result = matrix.combinedCost(this.character,this.templateCharacter);
+		var displayMsg = "";
+		var errorCharacter = [];
+		var diff = 0;
+		// debugger
+		// var hungarian = new hungarian();
+		var analysisResult = this.hungarian.computeAssignment(result);
+		var temp = new Array(analysisResult.length);
+		for(var i = 0; i< analysisResult.length;i++){
+			temp[i] = analysisResult[i][0];
+		}
+		if( this.character.length === 0){
+			displayMsg += this.model.nls.writeCharacterMsg;
+		} 
+		debugger
+		if( this.character.length >= this.templateCharacter.length){
+			displayMsg += this.displayStrokeSequenceError(temp);	
+			diff = this.character.length - this.templateCharacter.length;
+			for(var i =0; i < diff; i++){
+				errorCharacter.push(this.character[this.templateCharacter.length+i]);
+				displayMsg += this.model.nls.extraStrokeMsg.replace('~~1',(this.templateCharacter.length+i+1));
+			}
+			this.redrawCharacter(this.context, errorCharacter, this.ratio);
+			if(displayMsg === ""){
+				displayMsg = this.model.nls.correctMsg;
+			}
+		}else if(this.templateCharacter.length > this.character.length){
+			diff = this.templateCharacter.length - this.character.length;
+			for(var i = 0; i< diff; i++){
+				errorCharacter.push(this.templateCharacter[temp[this.character.length+i]]);
+				displayMsg += this.model.nls.missingStrokeMsg.replace('~~1',temp[this.character.length+i]+1);
+			}
+			this.context.strokeStyle = "#F0F8FF";
+			this.redrawCharacter(this.context, errorCharacter, this.ratio);
+		}
+		console.log("displayMsg:",displayMsg);
+	}
+	me.prototype.displayStrokeSequenceError = function displayStrokeSequenceError(analysisResult){
+		var replacedLoc = new Array(analysisResult.length);
+		var temp = new stroke();
+		var replaced = false;
+		var errorMsg = "";
+		console.log("this.model", this.model);
+		for(var i =0; i<analysisResult.length;i++){
+			if(i==analysisResult[i]){
+				continue;
+			}
+			else if(i<analysisResult[i]){
+				temp[i] = this.character[i] = this.character[analysisResult[i]];
+				errorMsg += this.model.nls.strokeSequenceMsg.replace('~~1',(analysisResult[i]+1)).replace('~~2',(i+1)) + "<br/>";
+				replacedLoc[i] = i;
+			}
+			else{
+				for(var n = 0; n< replacedLoc.length;n++){
+					if(replacedLoc[n] == analysisResult[i]){
+						temp[i] = this.character[i] = this.character[temp[n]];
+						replacedLoc[i] = i;
+						replaced = true;
+						errorMsg += this.model.nls.strokeSequenceMsg.replace('~~1',(analysisResult[i]+1)).replace('~~2',(i+1)) + "<br/>";
+						break;
+					}
+				}
+				if(!replaced){
+					temp[i] = this.character[i] = this.character[analysisResult[i]];
+					replacedLoc[i] = i;
+				}
+				replaced = false;
+			}
+		}
+		return errorMsg;
+	}	
 	//redrawCharacter(): should accept two arguments, one is character, the other one is context
 	me.prototype.redrawCharacter = function(context, character,ratio){
 		if(character){

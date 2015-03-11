@@ -17,6 +17,7 @@ require.config({
 	 "crossDomainAjax": "lib/crossDomainAjax",
 	 "iscroll": "lib/iscroll",
 	 "plugin": "web/controller/plugin",
+	 "hungarian": "web/controller/hungarian",
 	 "matrixCal": "web/controller/matrixCalculation",
 	 "strokeStyle": "web/controller/strokeController"
 	},

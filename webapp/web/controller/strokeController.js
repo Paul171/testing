@@ -3,6 +3,7 @@ define(['jquery'],function($){
 	var strokeController = function(){
 	  this.xCoordinate = [],
 	  this.yCoordinate = [];
+	  this.count = 0;
 	};
 	strokeController.prototype.getXCoordinate = function(){
 		return this.xCoordinate;
@@ -19,6 +20,10 @@ define(['jquery'],function($){
 	strokeController.prototype.setCoordinateByIndex = function(index, replaceValueX, replaceValueY){
 		this.yCoordinate[index] = replaceValueY;
 		this.xCoordinate[index] = replaceValueX;
+		this.count++;
+	};
+	strokeController.prototype.getCount = function(){
+		return this.count;
 	};
 	return strokeController;
 });
