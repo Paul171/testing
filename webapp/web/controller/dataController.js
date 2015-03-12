@@ -230,7 +230,7 @@ define(["jquery",
 			diff = this.character.length - this.templateCharacter.length;
 			for(var i =0; i < diff; i++){
 				errorCharacter.push(this.character[this.templateCharacter.length+i]);
-				displayMsg += this.model.nls.extraStrokeMsg.replace('~~1',(this.templateCharacter.length+i+1));
+				displayMsg += this.model.nls.extraStrokeMsg.replace('~~1',(this.templateCharacter.length+i+1)) +"<br/>";
 			}
 			this.redrawCharacter(this.context, errorCharacter, this.ratio);
 			if(displayMsg === ""){
@@ -253,6 +253,9 @@ define(["jquery",
 		var replaced = false;
 		var errorMsg = "";
 		console.log("this.model", this.model);
+		for(var i = 0; i < replacedLoc.length; i++){
+			replacedLoc[i] = 0;
+		}
 		for(var i =0; i<analysisResult.length;i++){
 			if(i==analysisResult[i]){
 				continue;
