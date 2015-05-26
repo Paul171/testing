@@ -72,7 +72,7 @@ var server = http.createServer(function(request, response) {
 	}
     });
 
-server.listen(443);
+server.listen(8080);
 io.listen(server);
 var serv_io = io.listen(server);
 var str = 'hello world';
