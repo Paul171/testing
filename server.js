@@ -80,7 +80,8 @@ var server = http.createServer(function(request, response) {
 	 //    response.end();
 	    break;
 	}
-    }).listen();
+    });
+  server.listen(8080);
 io.listen(server);
 var serv_io = io.listen(server);
 var str = 'hello world';
