@@ -38,7 +38,7 @@ var server = http.createServer(function(request, response) {
 			response.write("opps this doesn't exist - 404");
 		    } else {
 			response.writeHead(200, {"Content-Type": "text/html"});
-			response.write(data, "utf8");
+			response.write("hello", "utf8");
 		    }
 		    response.end();
 		});
