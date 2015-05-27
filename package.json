@@ -12,6 +12,10 @@
   "engines": {
     "node": "0.12.2"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Paul171/testing"
+  },
   "keywords": [
     "node",
     "heroku",
