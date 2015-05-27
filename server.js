@@ -32,9 +32,16 @@ var server = http.createServer(function(request, response) {
 		});
 	    break;
 	default:
-	response.writeHead(200, {"Content-Type": "text/html"});
-	response.write("opps this doesn't exist - 404");
-	response.end();
+		fs.readFile(__dirname + '/socket.html', function(error, data) {
+		    if (error){
+			response.writeHead(404);
+			response.write("opps this doesn't exist - 404");
+		    } else {
+			response.writeHead(200, {"Content-Type": "text/html"});
+			response.write(data, "utf8");
+		    }
+		    response.end();
+		});
 		// request.on('data',function(data){
 		// 	reqData += data;
 		// 	console.log("data",data);
