@@ -4,7 +4,7 @@
   "description": "A sample Node.js app using Express 4",
   "main": "server.js",
   "dependencies": {
-    "socket.io": "~1.2.x"
+    "express": "~4.9.x"
   },
   "engines": {
     "node": "0.10.x"
@@ -17,6 +17,5 @@
     "node",
     "heroku",
     "socket.io"
-  ],
-  "license": "MIT"
+  ]
 }
