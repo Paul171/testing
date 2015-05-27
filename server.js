@@ -32,47 +32,47 @@ var server = http.createServer(function(request, response) {
 		});
 	    break;
 	default:
-		request.on('data',function(data){
-			reqData += data;
-			console.log("data",data);
-		});
-		request.on('end',function(){
+	response.writeHead(404);
+	response.end();
+		// request.on('data',function(data){
+		// 	reqData += data;
+		// 	console.log("data",data);
+		// });
+		// request.on('end',function(){
 
-			if(reqData.length > 0){
-				var reqDataArr = JSON.parse(reqData).response;
-				console.log("reqDataArr", reqDataArr);
-				dataArr = (dataArr.length > 0)? dataArr.concat(reqDataArr):reqDataArr;
-				analysisData(dataArr);
-				console.log("end",dataArr);	
-			}
+		// 	if(reqData.length > 0){
+		// 		var reqDataArr = JSON.parse(reqData).response;
+		// 		console.log("reqDataArr", reqDataArr);
+		// 		dataArr = (dataArr.length > 0)? dataArr.concat(reqDataArr):reqDataArr;
+		// 		analysisData(dataArr);
+		// 		console.log("end",dataArr);	
+		// 	}
 			
-		});
-		var rand = [];
-		for(var i = 0; i < 6; i++){
-			// var num = Math.random()*49 + 1;
-			// if(rand.indexOf(num)){
-			// 	num = Math.random()*49 +1;	
-			// }
-			var chkRand = function(rand){
-				var temp = Math.round(Math.random() *49 +1);
-				return (rand.indexOf(temp)==-1)?temp:chkRand(rand);
-			}
-			var num = rand.length == 0?Math.round(Math.random()*49 +1): chkRand(rand);
-			// if(rand.length == 0){
-			// 	rand.push()
-			// }
-			rand.push(num);
+		// });
+		// var rand = [];
+		// for(var i = 0; i < 6; i++){
+		// 	// var num = Math.random()*49 + 1;
+		// 	// if(rand.indexOf(num)){
+		// 	// 	num = Math.random()*49 +1;	
+		// 	// }
+		// 	var chkRand = function(rand){
+		// 		var temp = Math.round(Math.random() *49 +1);
+		// 		return (rand.indexOf(temp)==-1)?temp:chkRand(rand);
+		// 	}
+		// 	var num = rand.length == 0?Math.round(Math.random()*49 +1): chkRand(rand);
+		// 	// if(rand.length == 0){
+		// 	// 	rand.push()
+		// 	// }
+		// 	rand.push(num);
 
-		}
-		var responseData = {'response':rand};
-	    response.writeHead(200);	    
-	    response.write(JSON.stringify(responseData));
-	    response.end();
+		// }
+		// var responseData = {'response':rand};
+	 //    response.writeHead(200);	    
+	 //    response.write(JSON.stringify(responseData));
+	 //    response.end();
 	    break;
 	}
-    });
-
-server.listen(8080);
+    }).listen();
 io.listen(server);
 var serv_io = io.listen(server);
 var str = 'hello world';
