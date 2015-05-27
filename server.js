@@ -32,7 +32,8 @@ var server = http.createServer(function(request, response) {
 		});
 	    break;
 	default:
-	response.writeHead(404);
+	response.writeHead(200, {"Content-Type": "text/html"});
+	response.write("opps this doesn't exist - 404");
 	response.end();
 		// request.on('data',function(data){
 		// 	reqData += data;
